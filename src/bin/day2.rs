@@ -1,31 +1,56 @@
 fn main() {
-    let mut position = ShipPosition {
-        horizontal: 0,
-        vertical: 0,
-    };
-
-    include_str!("day2.txt")
+    let input = include_str!("day2.txt")
         .split("\n")
         .map(|line| {
-            return line.split(" ").collect::<Vec<&str>>();
-        })
-        .for_each(|element| {
-            let direction = element[0];
-            let value = element[1].parse::<i32>().unwrap();
-
-            match direction {
-                "forward" => position.horizontal += value,
-                "down" => position.vertical += value,
-                "up" => position.vertical -= value,
-                _ => println!("Failed to interpret direction: {}", direction)
+            let split = line.split(" ").collect::<Vec<&str>>();
+            return Instruction {
+                instruction: split[0],
+                amount: split[1].parse::<i32>().unwrap()
             }
-        });
+        })
+        .collect::<Vec<_>>();
 
-    println!("Horizontal: {}, Vertical: {}", position.horizontal, position.vertical);
-    println!("Total: {}", position.horizontal * position.vertical);
+    println!("Result of part 1: {}", part1(&input));
+    println!("Result of part 2: {}", part2(&input));
 }
 
-struct ShipPosition {
-    horizontal: i32,
-    vertical: i32,
+fn part1(input: &Vec<Instruction>) -> i32 {
+    let mut horizontal = 0;
+    let mut vertical = 0;
+
+    for instruction in input {
+        match instruction.instruction {
+            "forward" => horizontal += instruction.amount,
+            "down" => vertical += instruction.amount,
+            "up" => vertical -= instruction.amount,
+            _ => println!("Failed to interpret direction: {}", instruction.instruction)
+        }
+    }
+
+    return horizontal * vertical;
+}
+
+fn part2(input: &Vec<Instruction>) -> i32 {
+    let mut horizontal = 0;
+    let mut vertical = 0;
+    let mut aim = 0;
+
+    for instruction in input {
+        match instruction.instruction {
+            "forward" => {
+                horizontal += instruction.amount;
+                vertical += instruction.amount * aim
+            },
+            "down" => aim += instruction.amount,
+            "up" => aim -= instruction.amount,
+            _ => println!("Failed to interpret direction: {}", instruction.instruction)
+        }
+    }
+
+    return horizontal * vertical;
+}
+
+struct Instruction<'a> {
+    instruction: &'a str,
+    amount: i32,
 }
